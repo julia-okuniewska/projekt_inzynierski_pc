@@ -4,13 +4,18 @@ from PySide2.QtGui import *
 from PySide2.QtUiTools import QUiLoader
 
 from my_utils import SerialReader, parse
-from hardware import Actuator
+from hardware import Actuator, actuator_names
 
+
+class TseMainWindowSignals(QObject):
+    sendSerial = Signal(str)
 
 
 class TseMainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
+
+        self.signals = TseMainWindowSignals()
 
         # Load UI and show
         designer_file = QFile("TSE_PC.ui")
@@ -25,6 +30,10 @@ class TseMainWindow(QMainWindow):
         self.ui.setLayout(grid_layout)
 
         self.ui.show()
+        # -----------------
+        self.ui.group_homing.setEnabled(False)
+
+
         # -----------------
 
         self.preview_sliders = {
@@ -70,26 +79,32 @@ class TseMainWindow(QMainWindow):
             5: self.ui.l_b1_mod
         }
 
-        self.actuator_names = {
-            0: "R2",
-            1: "R1",
-            2: "G2",
-            3: "G1",
-            4: "B2",
-            5: "B1"
-        }
+    def parse_incoming_message(self, message):
+        if message == b"ALL_HOME\r\n":
+            self.ui.group_homing.setEnabled(True)
+        else:
+            message = parse(message)
+            self.update_labels(message)
+            self.update_preview_sliders(message)
 
     def update_labels(self, vals):
-        vals = parse(vals)
-        i = int(vals[0])
-        self.a_pos[i].setText(vals[1])
-        self.a_speed[i].setText(vals[2])
-        self.a_mod[i].setText(vals[3])
+        if len(vals) == 4:
+            i = int(vals[0])
+            self.a_pos[i].setText(vals[1])
+            self.a_speed[i].setText(vals[2])
+            self.a_mod[i].setText(vals[3])
 
     def update_preview_sliders(self, vals):
-        vals = parse(vals)
-        i = int(vals[0])
-        self.preview_sliders[i].setValue(float(vals[1]))
+        try:
+            i = int(vals[0])
+            self.preview_sliders[i].setValue(float(vals[1]))
+        except:
+            pass
+
+    def prepare_message(self):
+        message = self.ui.txt_homing.toPlainText()
+        print(message)
+        self.signals.sendSerial.emit(message)
 
 
 

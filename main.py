@@ -2,7 +2,7 @@ from PySide2.QtCore import QCoreApplication, Qt
 from PySide2.QtWidgets import QApplication
 
 from my_QMainWindow import TseMainWindow
-from my_utils import SerialReader, parse
+from my_utils import SerialReader
 from my_math import Logic
 
 import threading
@@ -20,9 +20,11 @@ def main():
     app = QApplication([])
     window = TseMainWindow()
 
-    serial_reader.signals.message.connect(window.update_labels)
-    serial_reader.signals.message.connect(window.update_preview_sliders)
+    serial_reader.signals.message.connect(window.parse_incoming_message)
     serial_reader.signals.message.connect(logic.update)
+
+    window.ui.btn_homing.clicked.connect(window.prepare_message)
+    window.signals.sendSerial.connect(serial_reader.write)
 
     thread = threading.Thread(target=serial_reader.loop)
     thread.start()
