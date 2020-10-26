@@ -33,7 +33,6 @@ class TseMainWindow(QMainWindow):
         # -----------------
         self.ui.group_homing.setEnabled(False)
 
-
         # -----------------
 
         self.preview_sliders = {
@@ -105,6 +104,4 @@ class TseMainWindow(QMainWindow):
         message = self.ui.txt_homing.toPlainText()
         print(message)
         self.signals.sendSerial.emit(message)
-
-
 

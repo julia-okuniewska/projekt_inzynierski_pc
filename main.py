@@ -1,4 +1,4 @@
-from PySide2.QtCore import QCoreApplication, Qt
+from PySide2.QtCore import QCoreApplication, Qt, QThread
 from PySide2.QtWidgets import QApplication
 
 from my_QMainWindow import TseMainWindow
@@ -29,6 +29,7 @@ def main():
     thread = threading.Thread(target=serial_reader.loop)
     thread.start()
 
+    app.aboutToQuit.connect(lambda: serial_reader.stop())
     app.exec_()
 
 

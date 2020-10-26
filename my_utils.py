@@ -17,11 +17,12 @@ class SerialSignals(QObject):
 class SerialReader:
     def __init__(self):
         self.ser = serial.Serial()
-        # self.ser.port = "/dev/ttyUSB0"
-        self.ser.port = "/dev/ttyACM0"
+        self.ser.port = "/dev/ttyUSB0"
+        # self.ser.port = "/dev/ttyACM0"
         self.ser.baudrate = 9600
         self.isOpen = False
         self.signals = SerialSignals()
+        self.keep_working = True
 
     def try_open(self):
         try:
@@ -39,9 +40,10 @@ class SerialReader:
         self.ser.write(message)
 
     def loop(self):
-        while True:
+        while self.keep_working:
             message = self.read()
             print(message)
             self.signals.message.emit(message)
 
-
+    def stop(self):
+        self.keep_working = False
