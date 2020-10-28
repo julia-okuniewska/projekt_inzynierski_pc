@@ -4,11 +4,12 @@ from PySide2.QtGui import *
 from PySide2.QtUiTools import QUiLoader
 
 from my_utils import SerialReader, parse
-from hardware import Actuator, actuator_names
+import numpy as np
 
 
 class TseMainWindowSignals(QObject):
     sendSerial = Signal(str)
+    sliderPosOrient = Signal(list)
 
 
 class TseMainWindow(QMainWindow):
@@ -78,6 +79,27 @@ class TseMainWindow(QMainWindow):
             5: self.ui.l_b1_mod
         }
 
+        self.ui.slider_dx.valueChanged.connect(self.pos_orient_slider_message)
+        self.ui.slider_dy.valueChanged.connect(self.pos_orient_slider_message)
+        self.ui.slider_dz.valueChanged.connect(self.pos_orient_slider_message)
+
+        self.ui.slider_d_phi.valueChanged.connect(self.pos_orient_slider_message)
+        self.ui.slider_d_theta.valueChanged.connect(self.pos_orient_slider_message)
+        self.ui.slider_d_psi.valueChanged.connect(self.pos_orient_slider_message)
+
+    def pos_orient_slider_message(self):
+        temp = np.zeros(6)
+
+        temp[0] = self.ui.slider_dx.value()
+        temp[1] = self.ui.slider_dy.value()
+        temp[2] = self.ui.slider_dz.value()
+        temp[3] = self.ui.slider_d_phi.value()
+        temp[4] = self.ui.slider_d_theta.value()
+        temp[5] = self.ui.slider_d_psi.value()
+
+        temp = temp / 10
+        self.signals.sliderPosOrient.emit(list(temp))
+
     def parse_incoming_message(self, message):
         if message == b"ALL_HOME\r\n":
             self.ui.group_homing.setEnabled(True)
@@ -99,6 +121,10 @@ class TseMainWindow(QMainWindow):
             self.preview_sliders[i].setValue(float(vals[1]))
         except:
             pass
+
+    def update_user_sliders(self, vals):
+        for i in self.user_sliders:
+            self.user_sliders[i].setValue(vals[i])
 
     def prepare_message(self):
         message = self.ui.txt_homing.toPlainText()

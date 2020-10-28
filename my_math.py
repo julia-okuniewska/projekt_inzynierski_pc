@@ -1,10 +1,18 @@
+from PySide2.QtCore import QObject, Signal
+
 from hardware import Actuator, Apex
 from my_utils import parse
 import numpy as np
 
 
+class LogicSignals(QObject):
+    setUserSliderValues = Signal(list)
+
 class Logic:
     def __init__(self):
+
+        self.signals = LogicSignals()
+
         self.actuators = []
         self.apexes = []  # C1, C2, C3
 
@@ -31,6 +39,30 @@ class Logic:
     def get_q(self):
         q = [act.curr_pos - act.prev_pos for act in self.actuators]
         return q
+
+    def get_act_pos(self):
+        pos = [act.curr_pos for act in self.actuators]
+        return pos
+
+
+
+    def slider_pos_orient(self, arr):
+
+        jc = calculate_JC(arr[0:3], arr[3:6])
+
+        js = calculate_JS(*self.get_q(), [0.1, 0.1, 0.1], [0.1, 0.1, 0.1], [0.1, 0.1, 0.1])
+        ji = js @ jc
+
+        p = np.asarray(arr)
+
+        new_q = ji @ p
+        new_q = new_q * 7500
+
+        pos = np.asarray(self.get_act_pos())
+        new_q = pos + new_q
+        self.signals.setUserSliderValues.emit(list(new_q))
+
+
 
 
 def calculate_JC(tse_pos, tse_orient):

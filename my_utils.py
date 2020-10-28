@@ -42,7 +42,7 @@ class SerialReader:
     def loop(self):
         while self.keep_working:
             message = self.read()
-            print(message)
+            # print(message)
             self.signals.message.emit(message)
 
     def stop(self):

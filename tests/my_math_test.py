@@ -26,12 +26,12 @@ def test():
     js_2 = calculate_JS_partial(sa_2, sb_2, apex_2)
     js_3 = calculate_JS_partial(sa_3, sb_3, apex_3)
 
-    print(js_1)
-    print(js_2)
-    print(js_3)
+    # print(js_1)
+    # print(js_2)
+    # print(js_3)
 
     js = calculate_JS(sa_1, sb_1, sa_2, sb_2, sa_3, sb_3, apex_1, apex_2, apex_3)
-    print(js)
+    # print(js)
 
 
 test()

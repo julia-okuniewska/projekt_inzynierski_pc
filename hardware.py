@@ -32,3 +32,20 @@ class Apex:
     def __init__(self, index):
         self.index = index
 
+        self.x = 0
+        self.y = 0
+        self.z = 0
+
+    def get_xyz(self):
+        return [self.x, self.y, self.z]
+
+
+    def calc_XC1(self, pos, orient):
+        ''''
+        n - phi
+        t - theta
+        '''
+        l_t = 0.3498745  # center upper platform to apex
+
+
+
