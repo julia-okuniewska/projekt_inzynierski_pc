@@ -24,6 +24,9 @@ class SerialReader:
         self.signals = SerialSignals()
         self.keep_working = True
 
+    def __del__(self):
+        self.ser.close()
+
     def try_open(self):
         try:
             self.ser.open()

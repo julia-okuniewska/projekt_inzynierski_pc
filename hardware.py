@@ -40,12 +40,6 @@ class Apex:
         return [self.x, self.y, self.z]
 
 
-    def calc_XC1(self, pos, orient):
-        ''''
-        n - phi
-        t - theta
-        '''
-        l_t = 0.3498745  # center upper platform to apex
 
 
 

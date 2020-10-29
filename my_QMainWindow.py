@@ -79,6 +79,7 @@ class TseMainWindow(QMainWindow):
             5: self.ui.l_b1_mod
         }
 
+        self.pos_orient_slider_message()
         self.ui.slider_dx.valueChanged.connect(self.pos_orient_slider_message)
         self.ui.slider_dy.valueChanged.connect(self.pos_orient_slider_message)
         self.ui.slider_dz.valueChanged.connect(self.pos_orient_slider_message)
@@ -97,7 +98,15 @@ class TseMainWindow(QMainWindow):
         temp[4] = self.ui.slider_d_theta.value()
         temp[5] = self.ui.slider_d_psi.value()
 
-        temp = temp / 10
+        temp = temp / 100
+
+        self.ui.l_dx.setText(str(temp[0]))
+        self.ui.l_dy.setText(str(temp[1]))
+        self.ui.l_dz.setText(str(temp[2]))
+        self.ui.l_d_phi.setText(str(temp[3]))
+        self.ui.l_d_theta.setText(str(temp[4]))
+        self.ui.l_d_psi.setText(str(temp[5]))
+
         self.signals.sliderPosOrient.emit(list(temp))
 
     def parse_incoming_message(self, message):
