@@ -34,9 +34,15 @@ def rotz(angle):
 
     return np.around(rot, decimals=3)
 
+# a = rotz(-90)
+# point = np.asarray([0.3, 0, 0.8]).T
+# print(point@a)
+
 
 class LogicSignals(QObject):
     setUserSliderValues = Signal(list)
+    setCurrentPosOrient = Signal(list, list, list, list)
+    setWantedPosOrient = Signal(list, list, list, list)
 
 
 class Logic:
@@ -47,8 +53,8 @@ class Logic:
         self.actuators = []
         self.apexes = []  # C1, C2, C3
 
-        self.upper_plate_pos = [0.01, 0.01, 0.5]
-        self.upper_plate_orient = [0.01, 0.01, 0.01]
+        self.upper_plate_pos = [0.0, 0.0, 0.5]
+        self.upper_plate_orient = [0.0, 0.0, 0.0]
 
         for i in range(6):
             self.actuators.append(Actuator(i))
@@ -79,7 +85,7 @@ class Logic:
         l_t = 0.3498745  # center upper platform to apex
         # (1)
         phi, theta, psi = orient[0], orient[1], orient[2]
-        matrix = np. around(rotx(phi) @ roty(theta) @ rotz(psi), decimals=3)
+        matrix = np. around(  rotz(psi) @ roty(theta) @ rotx(phi), decimals=3)
 
         n = matrix[:, 0]
         t = matrix[:, 1]
@@ -88,48 +94,70 @@ class Logic:
         sqr32 = np.sqrt(3)/2
 
         apex1 = Xt + l_t * n
-        apex2 = Xt + l_t * (sqr32 * t + 0.5 * n)
+        apex2 = Xt - l_t * (sqr32 * t + 0.5 * n)
         apex3 = Xt + l_t * (sqr32 * t - 0.5 * n)
 
         return apex1, apex2, apex3
 
     def slider_pos_orient(self, arr):
-        # # upper plate pos orient który chcę osiągnąć
-        # pos, orient = arr[0:3], arr[3:6]
-        #
-        # # jc = calculate_JC(pos, orient)
-        # apex1, apex2, apex3 = self.get_apex_points(pos, orient)
-        #
-        # js = calculate_JS(*self.get_q(), apex1, apex2, apex3)
-        # ji = js @ jc
-        #
-        # p_p = self.get_p()
-        # p = np.asarray(arr)
-        # p = p - p_p
-        # p = np.around(p, decimals=2)
-        #
-        # new_q = ji @ p
-        # new_q = new_q * 7500
-        #
-        # pos = np.asarray(self.get_act_pos())
-        # new_q = pos + new_q
-        # self.signals.setUserSliderValues.emit(list(new_q))
+        delta_q = self.method_one(arr)
 
-        # upper plate pos orient który chcę osiągnąć
+        # delta_q_one = self.method_two(arr)
+        np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
+
+        q = np.around(self.get_act_pos() / 7500, decimals=2)
+        q = 1 - q
+        new_q = 7500 - (q + delta_q) * 7500
+
+        self.signals.setUserSliderValues.emit(list(new_q))
+
+    def method_one(self, arr):
+        # # upper plate pos orient który chcę osiągnąć
         pos, orient = arr[0:3], arr[3:6]
 
-        # jc = calculate_JC(pos, orient)
+        jc = calculate_JC(pos, orient)
         apex1, apex2, apex3 = self.get_apex_points(pos, orient)
 
+        apex1 = (apex1.T@rotz(-90)).T
+        apex2 = (apex2.T@rotz(30)).T
+        apex3 = (apex3.T@rotz(150)).T
+
+        q = np.around(self.get_act_pos() / 7500, decimals=2)
+        q = 1 - q
+
+        js = calculate_JS(*q, apex1, apex2, apex3)
+        ji = js @ jc
+
         p_curr = self.get_p()
-        pos_curr = p_curr[0:3]
-        orient_curr = p_curr[3:6]
+        curr_pos, curr_orient = p_curr[0:3], p_curr[3:6]
 
-        delta_X = np.asarray(pos - pos_curr)
-        delta_Theta = np.asarray(orient - orient_curr)
+        delta_X = np.asarray(pos - curr_pos)
+        delta_Theta = np.asarray(orient - curr_orient)
 
-        q = self.get_act_pos()
-        q = q / 7500
+        p = [*delta_X, * delta_Theta]
+
+        new_q = ji @ p
+
+        self.signals.setCurrentPosOrient.emit(p, apex1, apex2, apex3)
+        return  new_q
+
+
+    def method_two(self, arr):
+        # upper plate pos orient który chcę osiągnąć
+        target_pos, target_orient = arr[0:3], arr[3:6]
+
+        p_curr = self.get_p()
+        curr_pos, curr_orient = p_curr[0:3], p_curr[3:6]
+
+        apex1, apex2, apex3 = self.get_apex_points(target_pos, target_orient)
+
+
+
+        delta_X = np.asarray(target_pos - curr_pos)
+        delta_Theta = np.asarray(target_orient - curr_orient)
+
+        q = np.around(self.get_act_pos() / 7500, decimals=2)
+        q = 1 -q
 
         js1 = calculate_JS_partial(q[0], q[1], apex1)
         js2 = calculate_JS_partial(q[2], q[3], apex2)
@@ -142,14 +170,14 @@ class Logic:
         jt[4:6, 0:3] = js3
 
         dT = np.asarray([[0,  0,  0],
-                         [0,  0,  1],
+                         [0,    0,  1],
                          [0, -1,  0]])
 
         dN = np.asarray([[0,  0, -1],
-                         [0,  0,  1],
+                         [0,  0,  0],
                          [1,  0,  0]])
 
-        jr = np.zeros((6,3))
+        jr = np.zeros((6, 3))
 
         sqr3_2 = np.sqrt(3)/2
 
@@ -157,18 +185,13 @@ class Logic:
         jr[2:4, 0:3] = -js2 @ (sqr3_2 * dT + 0.5 * dN)
         jr[4:6, 0:3] =  js3 @ (sqr3_2 * dT - 0.5 * dN)
 
-        l_t = 0.3498745  # center upper platform to apex
+        # l_t = 0.3498745  # center upper platform to apex
+        l_t = 0.1798745  # center upper platform to apex
         jr = l_t * jr
 
         delta_q = jt @ delta_X + jr @ delta_Theta
 
-        print("delta_q : ", delta_q)
-
-        new_q = (q + delta_q) * 7500
-
-        self.signals.setUserSliderValues.emit(list(new_q))
-
-
+        return delta_q
 
 
 
@@ -211,7 +234,9 @@ def calculate_JC(tse_pos, tse_orient):
 
 def calculate_JS_partial(sa, sb, apex):
     L_0 = 0.557036
+    # L_0 = 0.265
     L_1 = 0.476
+    # L_1 = 0.22
     L = L_0 + 2 * L_1
 
     r = np.sqrt(3)
@@ -249,12 +274,6 @@ def calculate_JS_partial(sa, sb, apex):
 
 
 def calculate_JS(sa_1, sb_1, sa_2, sb_2, sa_3, sb_3, apex_1, apex_2, apex_3):
-    L_0 = 0.557036
-    L_1 = 0.476
-    L = L_0 + 2 * L_1
-
-    r = np.sqrt(3)
-    m = (1 / 4) * (1 - (L / L_0) ** 2)
 
     p_sa = [sa_1, sa_2, sa_3]
     p_sb = [sb_1, sb_2, sb_3]

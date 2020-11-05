@@ -7,7 +7,8 @@ from PySide2.QtGui import *
 def parse(message):
     message = str(message)
     start = message.find('ac')
-    return message[start+2:].replace(r'\r\n', '').replace('\'', '').split(";")
+    end = message.find('aed')
+    return message[start+2:end].replace(r'\r\n', '').replace('\'', '').split(";")
 
 
 class SerialSignals(QObject):
@@ -45,7 +46,7 @@ class SerialReader:
     def loop(self):
         while self.keep_working:
             message = self.read()
-            # print(message)
+            print(message)
             self.signals.message.emit(message)
 
     def stop(self):

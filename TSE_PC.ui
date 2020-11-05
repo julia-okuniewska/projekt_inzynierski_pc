@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1164</width>
-    <height>761</height>
+    <width>1151</width>
+    <height>965</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,17 +20,10 @@
       <x>60</x>
       <y>30</y>
       <width>591</width>
-      <height>541</height>
+      <height>616</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Serial port status</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="font">
@@ -80,7 +73,7 @@
        <item row="1" column="3">
         <widget class="QSlider" name="slider_r2">
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -99,7 +92,7 @@
        <item row="2" column="0">
         <widget class="QSlider" name="slider_g2">
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -118,7 +111,7 @@
           </sizepolicy>
          </property>
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -134,7 +127,7 @@
        <item row="1" column="0">
         <widget class="QSlider" name="slider_b1">
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -147,7 +140,7 @@
        <item row="2" column="3">
         <widget class="QSlider" name="slider_g1">
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -172,7 +165,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -188,7 +181,7 @@
       </layout>
      </item>
      <item row="5" column="1">
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btn_task">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -227,7 +220,7 @@
        <item row="1" column="3">
         <widget class="QSlider" name="slider_r2_usr">
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -246,7 +239,7 @@
        <item row="2" column="0">
         <widget class="QSlider" name="slider_g2_usr">
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -259,7 +252,7 @@
        <item row="1" column="0">
         <widget class="QSlider" name="slider_b1_usr">
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -272,7 +265,7 @@
        <item row="2" column="3">
         <widget class="QSlider" name="slider_g1_usr">
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -313,7 +306,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -340,7 +333,7 @@
           </font>
          </property>
          <property name="maximum">
-          <number>7500</number>
+          <number>9000</number>
          </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -400,6 +393,13 @@
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Serial port status</string>
        </property>
       </widget>
      </item>
@@ -993,13 +993,235 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>680</y>
+      <width>678</width>
+      <height>221</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_17">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_18">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>CURRENT</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>top platform pos ( x, y, z) &amp; orient (phi, theta, psi)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QLabel" name="l_top_posorient">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>C1 xyz to O1</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <item>
+            <widget class="QLabel" name="l_C1_posorient">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <widget class="QLabel" name="label_15">
+           <property name="text">
+            <string>C2 xyz to O2</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <widget class="QLabel" name="l_C2_posorient">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_9">
+         <item>
+          <widget class="QLabel" name="label_17">
+           <property name="text">
+            <string>C3 xyz to O3</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_12">
+           <item>
+            <widget class="QLabel" name="l_C3_posorient">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_11">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_12">
+         <item>
+          <widget class="QLabel" name="label_19">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>WANTED</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_20">
+           <property name="text">
+            <string>top platform pos ( x, y, z) &amp; orient (phi, theta, psi)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <item>
+            <widget class="QLabel" name="l_top_posorient_2">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_13">
+         <item>
+          <widget class="QLabel" name="label_21">
+           <property name="text">
+            <string>C1 pos orient to O1</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <item>
+            <widget class="QLabel" name="l_C1_posorient_2">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_14">
+         <item>
+          <widget class="QLabel" name="label_22">
+           <property name="text">
+            <string>C2 pos orient to O2</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_15">
+           <item>
+            <widget class="QLabel" name="l_C2_posorient_2">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_15">
+         <item>
+          <widget class="QLabel" name="label_23">
+           <property name="text">
+            <string>C3 pos orient to O3</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_16">
+           <item>
+            <widget class="QLabel" name="l_C3_posorient_2">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1164</width>
+     <width>1151</width>
      <height>22</height>
     </rect>
    </property>

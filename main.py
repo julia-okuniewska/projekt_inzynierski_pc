@@ -23,11 +23,15 @@ def main():
     serial_reader.signals.message.connect(window.parse_incoming_message)
     serial_reader.signals.message.connect(logic.update)
 
-    window.ui.btn_homing.clicked.connect(window.prepare_message)
+    window.ui.btn_homing.clicked.connect(window.prepare_message_homing)
     window.signals.sendSerial.connect(serial_reader.write)
 
     window.signals.sliderPosOrient.connect(logic.slider_pos_orient)
     logic.signals.setUserSliderValues.connect(window.update_user_sliders)
+
+    logic.signals.setCurrentPosOrient.connect(window.update_current_posorient)
+
+    window.ui.btn_task.clicked.connect(window.prepare_message_task)
 
     thread = threading.Thread(target=serial_reader.loop)
     thread.start()
