@@ -40,6 +40,21 @@ class Apex:
         return [self.x, self.y, self.z]
 
 
+class IMU:
+    def __init__(self):
+        #Quaternion
+        self.a = -1
+        self.b = -1
+        self.c = -1
+        self.d = -1
+
+    def update(self, vals):
+        self.a = vals[0]
+        self.b = vals[1]
+        self.c = vals[2]
+        self.d = vals[3]
+
+
 
 
 

@@ -53,6 +53,7 @@ class Logic:
         self.actuators = []
         self.apexes = []  # C1, C2, C3
 
+        # init values after calibration, midpos
         self.upper_plate_pos = [0.0, 0.0, 0.5]
         self.upper_plate_orient = [0.0, 0.0, 0.0]
 
@@ -77,7 +78,7 @@ class Logic:
         q = [act.curr_pos - act.prev_pos for act in self.actuators]
         return q
 
-    def get_act_pos(self):
+    def qet_curr_q(self):
         pos = [act.curr_pos for act in self.actuators]
         return np.asarray(pos)
 
@@ -100,46 +101,46 @@ class Logic:
         return apex1, apex2, apex3
 
     def slider_pos_orient(self, arr):
-        delta_q = self.method_one(arr)
 
-        # delta_q_one = self.method_two(arr)
-        np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
+        delta_q = self.method_one(self.get_p(), arr)
 
-        q = np.around(self.get_act_pos() / 7500, decimals=2)
+        q = np.around(self.qet_curr_q() / 7500, decimals=2)
         q = 1 - q
         new_q = 7500 - (q + delta_q) * 7500
 
         self.signals.setUserSliderValues.emit(list(new_q))
 
-    def method_one(self, arr):
-        # # upper plate pos orient który chcę osiągnąć
-        pos, orient = arr[0:3], arr[3:6]
-
+    def method_one(self, p, delta_p):
+        pos, orient = p[0:3], p[3:6]
         jc = calculate_JC(pos, orient)
-        apex1, apex2, apex3 = self.get_apex_points(pos, orient)
+        apex1, apex2, apex3 = self.get_apex_points(np.asarray(pos), self.upper_plate_orient)
 
         apex1 = (apex1.T@rotz(-90)).T
         apex2 = (apex2.T@rotz(30)).T
         apex3 = (apex3.T@rotz(150)).T
 
-        q = np.around(self.get_act_pos() / 7500, decimals=2)
+        q = np.around(self.qet_curr_q() / 7500, decimals=2)
         q = 1 - q
 
         js = calculate_JS(*q, apex1, apex2, apex3)
         ji = js @ jc
 
-        p_curr = self.get_p()
-        curr_pos, curr_orient = p_curr[0:3], p_curr[3:6]
+        delta_q = ji @ delta_p
 
-        delta_X = np.asarray(pos - curr_pos)
-        delta_Theta = np.asarray(orient - curr_orient)
+        self.signals.setCurrentPosOrient.emit(self.get_p(), apex1, apex2, apex3)
 
-        p = [*delta_X, * delta_Theta]
+        new_p = p + delta_p
+        pos, orient = new_p[0:3], new_p[3:6]
+        apex1_wanted, apex2_wanted, apex3_wanted = self.get_apex_points(np.asarray(pos), self.upper_plate_orient)
 
-        new_q = ji @ p
+        apex1_wanted = (apex1_wanted.T @ rotz(-90)).T
+        apex2_wanted = (apex2_wanted.T @ rotz(30)).T
+        apex3_wanted = (apex3_wanted.T @ rotz(150)).T
 
-        self.signals.setCurrentPosOrient.emit(p, apex1, apex2, apex3)
-        return  new_q
+        self.signals.setWantedPosOrient.emit(new_p, apex1_wanted, apex2_wanted, apex3_wanted)
+
+
+        return delta_q
 
 
     def method_two(self, arr):
@@ -156,7 +157,7 @@ class Logic:
         delta_X = np.asarray(target_pos - curr_pos)
         delta_Theta = np.asarray(target_orient - curr_orient)
 
-        q = np.around(self.get_act_pos() / 7500, decimals=2)
+        q = np.around(self.qet_curr_q() / 7500, decimals=2)
         q = 1 -q
 
         js1 = calculate_JS_partial(q[0], q[1], apex1)

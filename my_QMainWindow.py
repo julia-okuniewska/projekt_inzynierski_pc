@@ -172,6 +172,20 @@ class TseMainWindow(QMainWindow):
         self.current_posorient[2].setText(prepare_string2(vals_c2))
         self.current_posorient[3].setText(prepare_string2(vals_c3))
 
+    def update_wanted_posorient(self, vals_top, vals_c1, vals_c2, vals_c3):
+        def prepare_string(arr):
+            arr = np.around(arr, decimals=3)
+            return f"{arr[0]}   {arr[1]}    {arr[2]}    {arr[3]}    {arr[4]}    {arr[5]}"
+
+        def prepare_string2(arr):
+            arr = np.around(arr, decimals=3)
+            return f"{arr[0]}   {arr[1]}    {arr[2]}"
+
+        self.wanted_posorient[0].setText(prepare_string(vals_top))
+        self.wanted_posorient[1].setText(prepare_string2(vals_c1))
+        self.wanted_posorient[2].setText(prepare_string2(vals_c2))
+        self.wanted_posorient[3].setText(prepare_string2(vals_c3))
+
     def prepare_message_homing(self):
         message = self.ui.txt_homing.toPlainText()
         self.signals.sendSerial.emit(message)

@@ -20,17 +20,24 @@ def main():
     app = QApplication([])
     window = TseMainWindow()
 
+    # logika
     serial_reader.signals.message.connect(window.parse_incoming_message)
     serial_reader.signals.message.connect(logic.update)
 
+    # przyciski HOME
     window.ui.btn_homing.clicked.connect(window.prepare_message_homing)
     window.signals.sendSerial.connect(serial_reader.write)
 
+    # from GUI dx dy to cal logic
     window.signals.sliderPosOrient.connect(logic.slider_pos_orient)
+    # from logic to update sliders with wanted pos
     logic.signals.setUserSliderValues.connect(window.update_user_sliders)
 
+    # apexes from logic to gui update
     logic.signals.setCurrentPosOrient.connect(window.update_current_posorient)
+    logic.signals.setWantedPosOrient.connect(window.update_wanted_posorient)
 
+    # task sending
     window.ui.btn_task.clicked.connect(window.prepare_message_task)
 
     thread = threading.Thread(target=serial_reader.loop)
