@@ -33,50 +33,39 @@ class TseMainWindow(QMainWindow):
         self.ui.show()
         # -----------------
         self.ui.group_homing.setEnabled(True)
-
+        # -----------------
+        self.camera_ctr = 0
+        self.camera_latest_message = 0
+        self.send_task_timer = QTimer()
+        self.send_task_timer.setInterval(2000)
         # -----------------
 
         self.preview_sliders = {
-            0: self.ui.slider_r2,
-            1: self.ui.slider_r1,
-            2: self.ui.slider_g2,
-            3: self.ui.slider_g1,
-            4: self.ui.slider_b2,
-            5: self.ui.slider_b1
+            0: self.ui.slider_r2, 1: self.ui.slider_r1, 2: self.ui.slider_g2,
+            3: self.ui.slider_g1, 4: self.ui.slider_b2, 5: self.ui.slider_b1
         }
 
         self.user_sliders = {
-            0: self.ui.slider_r2_usr,
-            1: self.ui.slider_r1_usr,
-            2: self.ui.slider_g2_usr,
-            3: self.ui.slider_g1_usr,
-            4: self.ui.slider_b2_usr,
-            5: self.ui.slider_b1_usr
+            0: self.ui.slider_r2_usr, 1: self.ui.slider_r1_usr, 2: self.ui.slider_g2_usr,
+            3: self.ui.slider_g1_usr, 4: self.ui.slider_b2_usr, 5: self.ui.slider_b1_usr
+        }
+
+        self.d_sliders = {
+            0: self.ui.slider_dx,    1: self.ui.slider_dy,      2: self.ui.slider_dz,
+            3: self.ui.slider_d_phi, 4: self.ui.slider_d_theta, 5: self.ui.slider_d_psi
         }
 
         self.a_pos = {
-            0: self.ui.l_r2_pos,
-            1: self.ui.l_r1_pos,
-            2: self.ui.l_g2_pos,
-            3: self.ui.l_g1_pos,
-            4: self.ui.l_b2_pos,
-            5: self.ui.l_b1_pos
+            0: self.ui.l_r2_pos, 1: self.ui.l_r1_pos, 2: self.ui.l_g2_pos,
+            3: self.ui.l_g1_pos, 4: self.ui.l_b2_pos, 5: self.ui.l_b1_pos
         }
         self.a_speed = {
-            0: self.ui.l_r2_speed,
-            1: self.ui.l_r1_speed,
-            2: self.ui.l_g2_speed,
-            3: self.ui.l_g1_speed,
-            4: self.ui.l_b2_speed,
-            5: self.ui.l_b1_speed
+            0: self.ui.l_r2_speed, 1: self.ui.l_r1_speed, 2: self.ui.l_g2_speed,
+            3: self.ui.l_g1_speed, 4: self.ui.l_b2_speed, 5: self.ui.l_b1_speed
         }
         self.a_mod = {
-            0: self.ui.l_r2_mod,
-            1: self.ui.l_r1_mod,
-            2: self.ui.l_g2_mod,
-            3: self.ui.l_g1_mod,
-            4: self.ui.l_b2_mod,
-            5: self.ui.l_b1_mod
+            0: self.ui.l_r2_mod, 1: self.ui.l_r1_mod, 2: self.ui.l_g2_mod,
+            3: self.ui.l_g1_mod, 4: self.ui.l_b2_mod, 5: self.ui.l_b1_mod
         }
 
         self.a_mod_meaning = {
@@ -89,37 +78,24 @@ class TseMainWindow(QMainWindow):
         }
 
         self.current_posorient = {
-            0: self.ui.l_top_posorient,
-            1: self.ui.l_C1_posorient,
-            2: self.ui.l_C2_posorient,
-            3: self.ui.l_C3_posorient,
+            0: self.ui.l_top_posorient, 1: self.ui.l_C1_posorient,
+            2: self.ui.l_C2_posorient,  3: self.ui.l_C3_posorient,
         }
         self.wanted_posorient = {
-            0: self.ui.l_top_posorient_2,
-            1: self.ui.l_C1_posorient_2,
-            2: self.ui.l_C2_posorient_2,
-            3: self.ui.l_C3_posorient_2,
+            0: self.ui.l_top_posorient_2, 1: self.ui.l_C1_posorient_2,
+            2: self.ui.l_C2_posorient_2,  3: self.ui.l_C3_posorient_2,
         }
 
         self.pos_orient_slider_message()
-        self.ui.slider_dx.valueChanged.connect(self.pos_orient_slider_message)
-        self.ui.slider_dy.valueChanged.connect(self.pos_orient_slider_message)
-        self.ui.slider_dz.valueChanged.connect(self.pos_orient_slider_message)
-
-        self.ui.slider_d_phi.valueChanged.connect(self.pos_orient_slider_message)
-        self.ui.slider_d_theta.valueChanged.connect(self.pos_orient_slider_message)
-        self.ui.slider_d_psi.valueChanged.connect(self.pos_orient_slider_message)
+        for i in self.d_sliders:
+            self.d_sliders[i].valueChanged.connect(self.pos_orient_slider_message)
 
     def pos_orient_slider_message(self):
         """predefined by user changes to dx dy dz ..."""
         temp = np.zeros(6)
 
-        temp[0] = self.ui.slider_dx.value()
-        temp[1] = self.ui.slider_dy.value()
-        temp[2] = self.ui.slider_dz.value()
-        temp[3] = self.ui.slider_d_phi.value()
-        temp[4] = self.ui.slider_d_theta.value()
-        temp[5] = self.ui.slider_d_psi.value()
+        for i in self.d_sliders:
+            temp[i] = self.d_sliders[i].value()
 
         temp = temp / 100
 
@@ -133,6 +109,8 @@ class TseMainWindow(QMainWindow):
         self.signals.sliderPosOrient.emit(list(temp))
 
     def parse_incoming_message(self, message):
+        """Parsing message from TSE"""
+
         if message == b"ALL_HOME\r\n":
             self.ui.group_homing.setEnabled(True)
         else:
@@ -141,6 +119,7 @@ class TseMainWindow(QMainWindow):
             self.update_preview_sliders(message)
 
     def update_labels(self, vals):
+        """Update labels about TSE status"""
         if len(vals) == 4:
             i = int(vals[0])
             self.a_pos[i].setText(vals[1])
@@ -186,11 +165,28 @@ class TseMainWindow(QMainWindow):
         self.wanted_posorient[2].setText(prepare_string2(vals_c2))
         self.wanted_posorient[3].setText(prepare_string2(vals_c3))
 
+    def update_camera_target_info(self, txt):
+        self.ui.camera_label.setText(txt)
+        # if self.ui.btn_autosend.isChecked():
+        #     self.camera_ctr = self.camera_ctr + 1
+        #     if self.camera_ctr == 20:
+        #         self.camera_ctr = 0
+        #         print("send_task_from_camera")
+        #         self.prepare_message_task()
+        # else:
+        #     print("no chceck")
+
+    def update_target_follow_derivatives(self, values):
+        if self.ui.btn_enable_yaw.isChecked():
+            for i in self.d_sliders:
+                self.d_sliders[i].setValue(values[i])
+
     def prepare_message_homing(self):
         message = self.ui.txt_homing.toPlainText()
         self.signals.sendSerial.emit(message)
 
     def prepare_message_task(self):
+        print("interrupt callback")
         vals = np.zeros((6,))
         for i in self.user_sliders:
             vals[i] = self.user_sliders[i].value()
@@ -201,6 +197,23 @@ class TseMainWindow(QMainWindow):
 
         message = f"tsk{vals[0]};{vals[1]};{vals[2]};{vals[3]};{vals[4]};{vals[5]}end"
         # print(message)
+        if message != self.camera_latest_message:
+            self.camera_latest_message = message
+            self.signals.sendSerial.emit(message)
 
-        self.signals.sendSerial.emit(message)
+    def set_sliders_to_test(self):
+        test_value = 2500
+        for i in self.user_sliders:
+            self.user_sliders[i].setValue(test_value)
 
+    def set_d_sliders_to_zero(self):
+        for i in self.d_sliders:
+            self.d_sliders[i].setValue(0)
+
+    def send_task_timer_callback(self):
+        if self.ui.btn_autosend.isChecked():
+            print('klik')
+            self.send_task_timer.start()
+        else:
+            self.send_task_timer.stop()
+            print("unclick")

@@ -1,7 +1,6 @@
 import serial
 
 from PySide2.QtCore import *
-from PySide2.QtGui import *
 
 
 def parse(message):
@@ -16,11 +15,11 @@ class SerialSignals(QObject):
 
 
 class SerialReader:
-    def __init__(self):
+    def __init__(self, port):
         self.ser = serial.Serial()
-        self.ser.port = "/dev/ttyUSB0"
-        # self.ser.port = "/dev/ttyACM0"
-        self.ser.baudrate = 9600
+        self.ser.port = port
+        self.ser.baudrate = 500000
+        # self.ser.baudrate = 9600
         self.isOpen = False
         self.signals = SerialSignals()
         self.keep_working = True
@@ -45,9 +44,10 @@ class SerialReader:
 
     def loop(self):
         while self.keep_working:
-            message = self.read()
-            print(message)
-            self.signals.message.emit(message)
+            if self.ser.in_waiting:
+                message = self.read()
+                # print(message)
+                self.signals.message.emit(message)
 
     def stop(self):
         self.keep_working = False

@@ -44,6 +44,8 @@ class LogicSignals(QObject):
     setCurrentPosOrient = Signal(list, list, list, list)
     setWantedPosOrient = Signal(list, list, list, list)
 
+    setFollowedUserSliders = Signal(list)
+
 
 class Logic:
     def __init__(self):
@@ -86,7 +88,7 @@ class Logic:
         l_t = 0.3498745  # center upper platform to apex
         # (1)
         phi, theta, psi = orient[0], orient[1], orient[2]
-        matrix = np. around(  rotz(psi) @ roty(theta) @ rotx(phi), decimals=3)
+        matrix = np. around(rotz(psi) @ roty(theta) @ rotx(phi), decimals=3)
 
         n = matrix[:, 0]
         t = matrix[:, 1]
@@ -138,8 +140,6 @@ class Logic:
         apex3_wanted = (apex3_wanted.T @ rotz(150)).T
 
         self.signals.setWantedPosOrient.emit(new_p, apex1_wanted, apex2_wanted, apex3_wanted)
-
-
         return delta_q
 
 
@@ -152,13 +152,11 @@ class Logic:
 
         apex1, apex2, apex3 = self.get_apex_points(target_pos, target_orient)
 
-
-
         delta_X = np.asarray(target_pos - curr_pos)
         delta_Theta = np.asarray(target_orient - curr_orient)
 
         q = np.around(self.qet_curr_q() / 7500, decimals=2)
-        q = 1 -q
+        q = 1 - q
 
         js1 = calculate_JS_partial(q[0], q[1], apex1)
         js2 = calculate_JS_partial(q[2], q[3], apex2)
@@ -171,7 +169,7 @@ class Logic:
         jt[4:6, 0:3] = js3
 
         dT = np.asarray([[0,  0,  0],
-                         [0,    0,  1],
+                         [0,  0,  1],
                          [0, -1,  0]])
 
         dN = np.asarray([[0,  0, -1],
@@ -194,6 +192,26 @@ class Logic:
 
         return delta_q
 
+    def get_dposorient_to_follow_target(self, target_data):
+        target_data = str(target_data)
+        target_data = target_data.replace("b", "").replace("'", "").split(';')
+
+        if len(target_data) == 1 and target_data[0] == "empty":
+            print("ojej")
+
+        elif len(target_data) == 4:
+            # print(target_data)
+            dir_width, dir_height, val_width, val_height = target_data
+            val_width = int(val_width)
+            val_height = int(val_height)
+
+            if dir_width == 'left':
+                d = - 0.4 * val_width
+            else:
+                d =   0.4 * val_width
+
+        dd = [0, 0, 0, 0, 0, d]
+        self.signals.setFollowedUserSliders.emit(dd)
 
 
 def calculate_JC(tse_pos, tse_orient):
