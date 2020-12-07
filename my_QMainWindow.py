@@ -37,7 +37,7 @@ class TseMainWindow(QMainWindow):
         self.camera_ctr = 0
         self.camera_latest_message = 0
         self.send_task_timer = QTimer()
-        self.send_task_timer.setInterval(2000)
+        self.send_task_timer.setInterval(1000)
         # -----------------
 
         self.preview_sliders = {
@@ -113,6 +113,12 @@ class TseMainWindow(QMainWindow):
 
         if message == b"ALL_HOME\r\n":
             self.ui.group_homing.setEnabled(True)
+
+        elif message == b"TASK_DONE\r\n":
+            if self.ui.btn_autosend.isChecked():
+                self.send_task_timer.stop()
+                self.prepare_message_task()
+                self.send_task_timer.start()
         else:
             message = parse(message)
             self.update_labels(message)
@@ -186,7 +192,6 @@ class TseMainWindow(QMainWindow):
         self.signals.sendSerial.emit(message)
 
     def prepare_message_task(self):
-        print("interrupt callback")
         vals = np.zeros((6,))
         for i in self.user_sliders:
             vals[i] = self.user_sliders[i].value()

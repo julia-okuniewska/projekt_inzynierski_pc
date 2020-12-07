@@ -206,9 +206,9 @@ class Logic:
             val_height = int(val_height)
 
             if dir_width == 'left':
-                d = - 0.4 * val_width
+                d = - 0.5 * val_width
             else:
-                d =   0.4 * val_width
+                d =   0.5 * val_width
 
         dd = [0, 0, 0, 0, 0, d]
         self.signals.setFollowedUserSliders.emit(dd)
