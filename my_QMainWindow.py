@@ -39,6 +39,8 @@ class TseMainWindow(QMainWindow):
         self.send_task_timer = QTimer()
         self.send_task_timer.setInterval(1000)
         # -----------------
+        self.loop_status = 0
+        # -----------------
 
         self.preview_sliders = {
             0: self.ui.slider_r2, 1: self.ui.slider_r1, 2: self.ui.slider_g2,
@@ -119,6 +121,10 @@ class TseMainWindow(QMainWindow):
                 self.send_task_timer.stop()
                 self.prepare_message_task()
                 self.send_task_timer.start()
+
+            elif self.ui.btn_loop.isChecked():
+                self.loop_routine()
+
         else:
             message = parse(message)
             self.update_labels(message)
@@ -182,8 +188,16 @@ class TseMainWindow(QMainWindow):
         # else:
         #     print("no chceck")
 
-    def update_target_follow_derivatives(self, values):
-        if self.ui.btn_enable_yaw.isChecked():
+    def update_target_follow_derivatives(self, dd):
+        if self.ui.btn_enable_yaw.isChecked() or self.ui.btn_enable_z.isChecked():
+            d_z, d_yaw = dd
+            values = [0, 0, 0, 0, 0, 0]
+
+            if self.ui.btn_enable_z.isChecked():
+                values[2] = d_z
+            if self.ui.btn_enable_yaw.isChecked():
+                values[5] = d_yaw
+
             for i in self.d_sliders:
                 self.d_sliders[i].setValue(values[i])
 
@@ -217,8 +231,25 @@ class TseMainWindow(QMainWindow):
 
     def send_task_timer_callback(self):
         if self.ui.btn_autosend.isChecked():
-            print('klik')
             self.send_task_timer.start()
         else:
             self.send_task_timer.stop()
-            print("unclick")
+
+    def loop_button_callback(self):
+        if self.ui.btn_loop.isChecked():
+            self.send_task_timer.stop()
+            self.ui.btn_enable_yaw.setChecked(False)
+            self.ui.btn_enable_z.setChecked(False)
+            self.ui.btn_autosend.setChecked(False)
+
+    def loop_routine(self):
+        upper = 4000
+        lower = 1000
+        if self.loop_status == 1:
+            message = f"tsk{upper};{upper};{upper};{upper};{upper};{upper}end"
+        else:
+            message = f"tsk{lower};{lower};{lower};{lower};{lower};{lower}end"
+
+        self.loop_status = 1 - self.loop_status
+        self.signals.sendSerial.emit(message)
+

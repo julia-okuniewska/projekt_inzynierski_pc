@@ -853,7 +853,7 @@
        <item>
         <widget class="QSlider" name="slider_dz">
          <property name="minimum">
-          <number>0</number>
+          <number>-100</number>
          </property>
          <property name="maximum">
           <number>100</number>
@@ -862,7 +862,7 @@
           <number>3</number>
          </property>
          <property name="value">
-          <number>50</number>
+          <number>0</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -1012,7 +1012,7 @@
      <rect>
       <x>50</x>
       <y>680</y>
-      <width>678</width>
+      <width>521</width>
       <height>221</height>
      </rect>
     </property>
@@ -1030,14 +1030,14 @@
             </font>
            </property>
            <property name="text">
-            <string>CURRENT</string>
+            <string>CURRENT POS ORIENT</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_7">
            <property name="text">
-            <string>top platform pos ( x, y, z) &amp; orient (phi, theta, psi)</string>
+            <string>top platform  x, y, z &amp; phi, theta, psi</string>
            </property>
           </widget>
          </item>
@@ -1135,14 +1135,14 @@
             </font>
            </property>
            <property name="text">
-            <string>WANTED</string>
+            <string>WANTED POS ORIENT</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_20">
            <property name="text">
-            <string>top platform pos ( x, y, z) &amp; orient (phi, theta, psi)</string>
+            <string>top platform  x, y, z &amp; phi, theta, psi</string>
            </property>
           </widget>
          </item>
@@ -1321,13 +1321,13 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>820</x>
       <y>670</y>
       <width>301</width>
-      <height>119</height>
+      <height>155</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1405,6 +1405,22 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QPushButton" name="btn_loop">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>680</y>
+      <width>101</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>LOOP</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

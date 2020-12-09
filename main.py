@@ -14,8 +14,8 @@ def main():
     logic = Logic()
 
     # Serial to Arduino
-    # serial_reader = SerialReader("/dev/ttyUSB0")
-    serial_reader = SerialReader("/dev/ttyACM0")
+    serial_reader = SerialReader("/dev/ttyUSB0")
+    # serial_reader = SerialReader("/dev/ttyACM0")
     while not serial_reader.isOpen:
         serial_reader.try_open()
 
@@ -63,6 +63,9 @@ def main():
     window.ui.btn_test_pos.clicked.connect(window.set_sliders_to_test)
     window.ui.btn_zero.clicked.connect(window.set_d_sliders_to_zero)
 
+    # loop button callback
+    window.ui.btn_loop.clicked.connect(window.loop_button_callback)
+
     #threading Serial and TCP
     thread = threading.Thread(target=serial_reader.loop, daemon=True)
     thread.start()
@@ -79,3 +82,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+

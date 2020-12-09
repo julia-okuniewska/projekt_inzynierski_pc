@@ -44,7 +44,7 @@ class LogicSignals(QObject):
     setCurrentPosOrient = Signal(list, list, list, list)
     setWantedPosOrient = Signal(list, list, list, list)
 
-    setFollowedUserSliders = Signal(list)
+    setFollowedUserSliders = Signal(tuple)
 
 
 class Logic:
@@ -197,7 +197,7 @@ class Logic:
         target_data = target_data.replace("b", "").replace("'", "").split(';')
 
         if len(target_data) == 1 and target_data[0] == "empty":
-            print("ojej")
+            pass
 
         elif len(target_data) == 4:
             # print(target_data)
@@ -206,11 +206,21 @@ class Logic:
             val_height = int(val_height)
 
             if dir_width == 'left':
-                d = - 0.5 * val_width
+                d_yaw = - 0.5 * val_width
+            elif dir_width == 'right':
+                d_yaw =   0.5 * val_width
             else:
-                d =   0.5 * val_width
+                d_yaw = 0
 
-        dd = [0, 0, 0, 0, 0, d]
+            if dir_height == 'up':
+                d_z =  0.1 * val_height
+            elif dir_height == 'down':
+                d_z = -  0.1 * val_height
+
+            else:
+                d_z = 0
+
+        dd = (d_z, d_yaw)
         self.signals.setFollowedUserSliders.emit(dd)
 
 
