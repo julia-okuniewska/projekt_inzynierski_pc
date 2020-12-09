@@ -1234,8 +1234,8 @@
      <rect>
       <x>820</x>
       <y>800</y>
-      <width>241</width>
-      <height>102</height>
+      <width>221</width>
+      <height>111</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -1327,7 +1327,7 @@
       <x>820</x>
       <y>670</y>
       <width>301</width>
-      <height>155</height>
+      <height>131</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1417,6 +1417,22 @@
     </property>
     <property name="text">
      <string>LOOP</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_log_to_file">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>760</y>
+      <width>101</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>LOG TO FILE</string>
     </property>
     <property name="checkable">
      <bool>true</bool>

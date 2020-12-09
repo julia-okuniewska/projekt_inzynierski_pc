@@ -3,7 +3,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtUiTools import QUiLoader
 
-from my_utils import SerialReader, parse
+from my_utils import SerialReader, parse, MeasurementLogger
 import numpy as np
 
 
@@ -40,6 +40,8 @@ class TseMainWindow(QMainWindow):
         self.send_task_timer.setInterval(1000)
         # -----------------
         self.loop_status = 0
+        # -----------------
+        self.logger = MeasurementLogger()
         # -----------------
 
         self.preview_sliders = {
@@ -142,6 +144,10 @@ class TseMainWindow(QMainWindow):
         try:
             i = int(vals[0])
             self.preview_sliders[i].setValue(float(vals[1]))
+
+            if self.ui.btn_log_to_file.isChecked():
+                self.logger.write_to_file(str(vals))
+
         except:
             pass
 
@@ -253,3 +259,12 @@ class TseMainWindow(QMainWindow):
         self.loop_status = 1 - self.loop_status
         self.signals.sendSerial.emit(message)
 
+    def log_to_file_callback(self):
+        if self.ui.btn_log_to_file.isChecked():
+            self.logger.create_file()
+            self.ui.btn_log_to_file.setStyleSheet("background-color: red")
+            self.ui.btn_log_to_file.setText("LOGGING ...")
+        else:
+            self.logger.close_file()
+            self.ui.btn_log_to_file.setStyleSheet("")
+            self.ui.btn_log_to_file.setText("LOG TO FILE")

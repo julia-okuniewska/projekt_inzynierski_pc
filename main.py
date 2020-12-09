@@ -65,6 +65,8 @@ def main():
 
     # loop button callback
     window.ui.btn_loop.clicked.connect(window.loop_button_callback)
+    # log to file button callback
+    window.ui.btn_log_to_file.clicked.connect(window.log_to_file_callback)
 
     #threading Serial and TCP
     thread = threading.Thread(target=serial_reader.loop, daemon=True)

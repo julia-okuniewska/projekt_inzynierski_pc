@@ -1,5 +1,5 @@
 import serial
-
+from datetime import datetime
 from PySide2.QtCore import *
 
 
@@ -51,3 +51,24 @@ class SerialReader:
 
     def stop(self):
         self.keep_working = False
+
+
+class MeasurementLogger:
+    def __init__(self):
+        self.time = 0
+        self.file_handler = 0
+
+    def create_file(self):
+        self.file_handler = open("tse_dump.txt", "w+")
+        self.time = datetime.timestamp(datetime.now())
+
+    def write_to_file(self, content: str):
+        now = datetime.timestamp(datetime.now())
+        d_t = (now - self.time) * 1000
+        # get current time, update and save content to file
+        self.file_handler.write(f"{d_t} {content}\r\n")
+        print(f"SAVE {self.time} {content}\r\n")
+
+    def close_file(self):
+        print("close file")
+        self.file_handler.close()
