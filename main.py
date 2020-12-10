@@ -14,8 +14,8 @@ def main():
     logic = Logic()
 
     # Serial to Arduino
-    serial_reader = SerialReader("/dev/ttyUSB0")
-    # serial_reader = SerialReader("/dev/ttyACM0")
+    # serial_reader = SerialReader("/dev/ttyUSB0")
+    serial_reader = SerialReader("/dev/ttyACM0")
     while not serial_reader.isOpen:
         serial_reader.try_open()
 

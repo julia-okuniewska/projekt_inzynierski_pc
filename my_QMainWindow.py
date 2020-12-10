@@ -146,7 +146,8 @@ class TseMainWindow(QMainWindow):
             self.preview_sliders[i].setValue(float(vals[1]))
 
             if self.ui.btn_log_to_file.isChecked():
-                self.logger.write_to_file(str(vals))
+                log = f"{vals[0]} {vals[1]}"
+                self.logger.write_to_file(log)
 
         except:
             pass

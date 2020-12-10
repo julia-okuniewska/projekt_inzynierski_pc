@@ -67,7 +67,7 @@ class MeasurementLogger:
         d_t = (now - self.time) * 1000
         # get current time, update and save content to file
         self.file_handler.write(f"{d_t} {content}\r\n")
-        print(f"SAVE {self.time} {content}\r\n")
+        # print(f"SAVE {self.time} {content}\r\n")
 
     def close_file(self):
         print("close file")

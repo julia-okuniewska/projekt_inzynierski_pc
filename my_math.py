@@ -213,9 +213,9 @@ class Logic:
                 d_yaw = 0
 
             if dir_height == 'up':
-                d_z =  0.1 * val_height
+                d_z =  0.3 * val_height
             elif dir_height == 'down':
-                d_z = -  0.1 * val_height
+                d_z = -  0.3 * val_height
 
             else:
                 d_z = 0
