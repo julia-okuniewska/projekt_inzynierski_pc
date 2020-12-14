@@ -10,6 +10,13 @@ def parse(message):
     return message[start+2:end].replace(r'\r\n', '').replace('\'', '').split(";")
 
 
+def parse_imu(message):
+    message = str(message)
+    start = message.find('imu')
+    end = message.find('end')
+    return message[start+3:end].replace(r'\r\n', '').replace('\'', '').split(";")
+
+
 class SerialSignals(QObject):
     message = Signal(bytes)
 
@@ -47,6 +54,9 @@ class SerialReader:
             if self.ser.in_waiting:
                 message = self.read()
                 # print(message)
+                if b'ac' not in message and b'TASK' not in message:
+                    print(message)
+
                 self.signals.message.emit(message)
 
     def stop(self):

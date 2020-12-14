@@ -3,7 +3,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtUiTools import QUiLoader
 
-from my_utils import SerialReader, parse, MeasurementLogger
+from my_utils import parse, parse_imu, MeasurementLogger
 import numpy as np
 
 
@@ -128,9 +128,13 @@ class TseMainWindow(QMainWindow):
                 self.loop_routine()
 
         else:
-            message = parse(message)
-            self.update_labels(message)
-            self.update_preview_sliders(message)
+            if b'imu' in message:
+                message = parse_imu(message)
+                self.update_imu_label(message)
+            else:
+                message = parse(message)
+                self.update_labels(message)
+                self.update_preview_sliders(message)
 
     def update_labels(self, vals):
         """Update labels about TSE status"""
@@ -194,6 +198,10 @@ class TseMainWindow(QMainWindow):
         #         self.prepare_message_task()
         # else:
         #     print("no chceck")
+
+    def update_imu_label(self, vals):
+        text = f"{vals[0]} {vals[1]} {vals[2]} {vals[3]}"
+        self.ui.l_top_quat.setText(text)
 
     def update_target_follow_derivatives(self, dd):
         if self.ui.btn_enable_yaw.isChecked() or self.ui.btn_enable_z.isChecked():
@@ -269,3 +277,4 @@ class TseMainWindow(QMainWindow):
             self.logger.close_file()
             self.ui.btn_log_to_file.setStyleSheet("")
             self.ui.btn_log_to_file.setText("LOG TO FILE")
+
