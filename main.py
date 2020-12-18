@@ -14,8 +14,8 @@ def main():
     logic = Logic()
 
     # Serial to Arduino
-    serial_reader = SerialReader("/dev/ttyUSB0")
-    # serial_reader = SerialReader("/dev/ttyACM0")
+    # serial_reader = SerialReader()
+    serial_reader = SerialReader()
     while not serial_reader.isOpen:
         serial_reader.try_open()
 
@@ -48,10 +48,13 @@ def main():
     window.ui.btn_task.clicked.connect(window.prepare_message_task)
 
     # tcp camera message -> gui update
-    tcp_server.signals.message.connect(window.update_camera_target_info)
+    tcp_server.signals.message_camera.connect(window.update_camera_target_info)
+    # tcp imu message -> gui update
+    tcp_server.signals.message_imu.connect(window.update_imu_label)
+
 
     # logic to dx dy ... predictions
-    tcp_server.signals.message.connect(logic.get_dposorient_to_follow_target)
+    # tcp_server.signals.message_camera.connect(logic.get_dposorient_to_follow_target)
     logic.signals.setFollowedUserSliders.connect(window.update_target_follow_derivatives)
 
     # timers interruptions, send task to TSE when enable

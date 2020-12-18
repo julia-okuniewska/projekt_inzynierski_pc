@@ -16,10 +16,28 @@ def read_records(path: str):
     return one_actuator
 
 
-speed_700 = read_records("tse_700_0tocenter.txt")
-speed_4500 = read_records("tse_4500_0tocenter.txt")
+pid = read_records("with_PID.txt")
+nopid = read_records("without_PID.txt")
+# speed_4500 = read_records("tse_4500_0tocenter.txt")
+
+pid[:, 0] = pid[:, 0] - pid[32, 0]
+pid[0:32, :] = 0
+
+nopid[:, 0] = nopid[:, 0] - nopid[27, 0]
+nopid[0:27, :] = 0
 
 
-plt.plot(speed_700[:, 0], speed_700[:, 2])
-plt.plot(speed_4500[:, 0], speed_4500[:, 2])
+# nopid = nopid/10
+# nopid[:, 0] = nopid[:, 0] - nopid[53, 0]
+# nopid[:, 0] = nopid[:, 0] - nopid[53, 0]
+plt.plot(nopid[:82, 0], nopid[:82, 2], '-x', label='Bez sterownika PID')
+plt.plot(pid[:87, 0], pid[:87, 2], '-x', label='Z sterownikiem PID')
+plt.plot([0, 1000], [1000, 1000],  '--g')
+
+plt.xlabel('Czas [ms]', fontsize=20)
+plt.ylabel('Położenie aktuatora', fontsize=20)
+
+plt.tick_params(labelsize=16)
+
+plt.legend(prop={'size': 20})
 plt.show()

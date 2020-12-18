@@ -5,6 +5,7 @@ from PySide2.QtUiTools import QUiLoader
 
 from my_utils import parse, parse_imu, MeasurementLogger
 import numpy as np
+from my_math import  to_euler
 
 
 class TseMainWindowSignals(QObject):
@@ -190,18 +191,18 @@ class TseMainWindow(QMainWindow):
 
     def update_camera_target_info(self, txt):
         self.ui.camera_label.setText(txt)
-        # if self.ui.btn_autosend.isChecked():
-        #     self.camera_ctr = self.camera_ctr + 1
-        #     if self.camera_ctr == 20:
-        #         self.camera_ctr = 0
-        #         print("send_task_from_camera")
-        #         self.prepare_message_task()
-        # else:
-        #     print("no chceck")
+        
 
     def update_imu_label(self, vals):
-        text = f"{vals[0]} {vals[1]} {vals[2]} {vals[3]}"
+
+        text = f"{vals[0]} {vals[1]} {vals[2]}"
         self.ui.l_top_quat.setText(text)
+
+        # that was from Arduino in quaternions
+        # e = to_euler(float(vals[0]), float(vals[1]), float(vals[2]), float(vals[3]))
+        # text = f"{vals[0]} {vals[1]} {vals[2]} {vals[3]} \r\n {e[0]} {e[1]} {e[2]}"
+        # print(e)
+        # self.ui.l_top_quat.setText(text)
 
     def update_target_follow_derivatives(self, dd):
         if self.ui.btn_enable_yaw.isChecked() or self.ui.btn_enable_z.isChecked():
@@ -236,7 +237,7 @@ class TseMainWindow(QMainWindow):
             self.signals.sendSerial.emit(message)
 
     def set_sliders_to_test(self):
-        test_value = 2500
+        test_value = 100
         for i in self.user_sliders:
             self.user_sliders[i].setValue(test_value)
 

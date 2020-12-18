@@ -7,14 +7,16 @@ from PySide2.QtCore import *
 
 
 class TCPSignals(QObject):
-    message = Signal(str)
+    message_camera = Signal(str)
+    message_imu = Signal(list)
 
 
 class TCP_Server:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     PORT = 20000
     # server_address = ('192.168.0.220', PORT)
-    server_address = ('192.168.31.162', PORT)
+    # server_address = ('192.168.31.162', PORT)
+    server_address = ('10.42.0.1', PORT)
     status = 'init'
     client_address = None
     connection = None
@@ -49,7 +51,17 @@ class TCP_Server:
                 # print(f'received {data}')
 
                 if data:
-                    self.signals.message.emit(str(data))
+                    # print(data)
+                    if b'imu' in data:
+                        message = str(data)
+                        start = message.find('imu')
+                        end = message.find('end')
+                        message = message[start + 3:end].split(";")
+                        if len(message) > 2:
+                            print(message)
+                            self.signals.message_imu.emit(message)
+                    else:
+                        self.signals.message_camera.emit(str(data))
                     pass
                 else:
                     print(f'no more data from {self.client_address}')

@@ -3,6 +3,8 @@ from PySide2.QtCore import QObject, Signal
 from hardware import Actuator, Apex
 from my_utils import parse
 import numpy as np
+from math import atan2, asin
+
 
 
 def rotx(angle):
@@ -323,4 +325,33 @@ def calculate_JS(sa_1, sb_1, sa_2, sb_2, sa_3, sb_3, apex_1, apex_2, apex_3):
 
     return JS
 
+def to_euler(w, x, y, z):
+    """
+    Returns the Euler angles as a tuple(roll, pitch, yaw)
+    This is a modified version of this:
+    https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+    """
+    ysqr = y * y
 
+    t0 = +2.0 * (w * x + y * z)
+    t1 = +1.0 - 2.0 * (x * x + ysqr)
+    X = atan2(t0, t1)
+
+    t2 = +2.0 * (w * y - z * x)
+    t2 = +1.0 if t2 > +1.0 else t2
+    t2 = -1.0 if t2 < -1.0 else t2
+    Y = asin(t2)
+
+    t3 = +2.0 * (w * z + x * y)
+    t4 = +1.0 - 2.0 * (ysqr + z * z)
+    Z = atan2(t3, t4)
+
+    X = np.rad2deg(X)
+    Y = np.rad2deg(Y)
+    Z = np.rad2deg(Z)
+
+    X = np.around(X, decimals=2)
+    Y = np.around(Y, decimals=2)
+    Z = np.around(Z, decimals=2)
+
+    return X, Y, Z

@@ -22,9 +22,11 @@ class SerialSignals(QObject):
 
 
 class SerialReader:
-    def __init__(self, port):
+    def __init__(self):
         self.ser = serial.Serial()
-        self.ser.port = port
+        self.port_list = ["/dev/ttyACM0", "/dev/ttyUSB0"]
+        self.port_iter = 0
+        self.ser.port = self.port_list[self.port_iter]
         self.ser.baudrate = 500000
         # self.ser.baudrate = 9600
         self.isOpen = False
@@ -40,6 +42,8 @@ class SerialReader:
             self.isOpen = True
             print("Serial port is open.")
         except Exception as e:
+            self.port_iter = 1 - self.port_iter
+            self.ser.port = self.port_list[self.port_iter]
             print("error open serial port: " + str(e))
 
     def read(self) -> bytes:
@@ -69,7 +73,7 @@ class MeasurementLogger:
         self.file_handler = 0
 
     def create_file(self):
-        self.file_handler = open("tse_dump.txt", "w+")
+        self.file_handler = open("logs/without_PID.txt", "w+")
         self.time = datetime.timestamp(datetime.now())
 
     def write_to_file(self, content: str):
