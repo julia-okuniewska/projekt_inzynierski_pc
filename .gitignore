@@ -130,3 +130,6 @@ dmypy.json
 
 #idea Pycharm
 .idea/
+
+/logs
+/logs/log_to_graph.py

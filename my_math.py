@@ -204,8 +204,8 @@ class Logic:
         elif len(target_data) == 4:
             # print(target_data)
             dir_width, dir_height, val_width, val_height = target_data
-            val_width = int(val_width)
-            val_height = int(val_height)
+            val_width = int(float(val_width))
+            val_height = int(float(val_height))
 
             if dir_width == 'left':
                 d_yaw = - 0.5 * val_width
@@ -215,13 +215,15 @@ class Logic:
                 d_yaw = 0
 
             if dir_height == 'up':
-                d_z =  0.3 * val_height
+                # d_z =  val_height/100
+                d_z =   val_height
             elif dir_height == 'down':
-                d_z = -  0.3 * val_height
+                # d_z = -val_height/100
+                d_z = -  val_height
 
             else:
                 d_z = 0
-
+            # print(val_width, val_height, d_yaw, d_z)
         dd = (d_z, d_yaw)
         self.signals.setFollowedUserSliders.emit(dd)
 

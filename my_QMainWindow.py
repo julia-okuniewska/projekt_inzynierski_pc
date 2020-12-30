@@ -43,6 +43,7 @@ class TseMainWindow(QMainWindow):
         self.loop_status = 0
         # -----------------
         self.logger = MeasurementLogger()
+        self.latest_IMU_measure = 0
         # -----------------
 
         self.preview_sliders = {
@@ -119,14 +120,15 @@ class TseMainWindow(QMainWindow):
         if message == b"ALL_HOME\r\n":
             self.ui.group_homing.setEnabled(True)
 
-        elif message == b"TASK_DONE\r\n":
+        elif message == b"TASK_DONE\r\n" or message == b"PAST_MIDWAY\r\n":
             if self.ui.btn_autosend.isChecked():
                 self.send_task_timer.stop()
                 self.prepare_message_task()
                 self.send_task_timer.start()
 
             elif self.ui.btn_loop.isChecked():
-                self.loop_routine()
+                if message == b"TASK_DONE\r\n":
+                    self.loop_routine()
 
         else:
             if b'imu' in message:
@@ -151,8 +153,13 @@ class TseMainWindow(QMainWindow):
             self.preview_sliders[i].setValue(float(vals[1]))
 
             if self.ui.btn_log_to_file.isChecked():
-                log = f"{vals[0]} {vals[1]}"
-                self.logger.write_to_file(log)
+                if self.ui.radio_log_engine.isChecked():
+                    log = f"{vals[0]} {vals[1]}"
+                    # print(log)
+                    self.logger.write_to_file(log)
+                else:
+                    print("wrong log config")
+
 
         except:
             pass
@@ -194,9 +201,13 @@ class TseMainWindow(QMainWindow):
         
 
     def update_imu_label(self, vals):
-
+        self.latest_IMU_measure = vals
         text = f"{vals[0]} {vals[1]} {vals[2]}"
         self.ui.l_top_quat.setText(text)
+
+        if self.ui.btn_log_to_file.isChecked():
+            if self.ui.radio_log_imu.isChecked():
+                self.logger.write_to_file(text)
 
         # that was from Arduino in quaternions
         # e = to_euler(float(vals[0]), float(vals[1]), float(vals[2]), float(vals[3]))
@@ -205,17 +216,41 @@ class TseMainWindow(QMainWindow):
         # self.ui.l_top_quat.setText(text)
 
     def update_target_follow_derivatives(self, dd):
+        values = [0, 0, 0, 0, 0, 0]
+
+        def override_sliders():
+            print(values)
+            for i in self.d_sliders:
+                self.d_sliders[i].setValue(values[i])
+
+        if self.ui.btn_stabilize.isChecked():
+            pitch_measure = float(self.latest_IMU_measure[1])
+            # if pitch_measure > 0:
+            #     d_pitch = pitch_measure
+            # elif pitch_measure < 0:
+            #     d_pitch = -pitch_measure
+            # else:
+            #     d_pitch = 0
+
+            if abs(pitch_measure) > 2:
+                d_pitch = - pitch_measure * 10
+            # else:
+            #     d_pitch = 0
+            print(d_pitch)
+            values[4] = d_pitch
+            override_sliders()
+
         if self.ui.btn_enable_yaw.isChecked() or self.ui.btn_enable_z.isChecked():
             d_z, d_yaw = dd
-            values = [0, 0, 0, 0, 0, 0]
-
             if self.ui.btn_enable_z.isChecked():
                 values[2] = d_z
+                # self.ui.slider_dz.setValue(d_z)
             if self.ui.btn_enable_yaw.isChecked():
                 values[5] = d_yaw
 
-            for i in self.d_sliders:
-                self.d_sliders[i].setValue(values[i])
+            override_sliders()
+
+
 
     def prepare_message_homing(self):
         message = self.ui.txt_homing.toPlainText()
@@ -237,7 +272,7 @@ class TseMainWindow(QMainWindow):
             self.signals.sendSerial.emit(message)
 
     def set_sliders_to_test(self):
-        test_value = 100
+        test_value = 0000
         for i in self.user_sliders:
             self.user_sliders[i].setValue(test_value)
 
@@ -278,4 +313,5 @@ class TseMainWindow(QMainWindow):
             self.logger.close_file()
             self.ui.btn_log_to_file.setStyleSheet("")
             self.ui.btn_log_to_file.setText("LOG TO FILE")
+
 

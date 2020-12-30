@@ -33,6 +33,7 @@ def main():
 
     # przyciski HOME
     window.ui.btn_homing.clicked.connect(window.prepare_message_homing)
+    window.ui.btn_homing_ack.clicked.connect(lambda x: serial_reader.write("9"))
     window.signals.sendSerial.connect(serial_reader.write)
 
     # from GUI dx dy to cal logic
@@ -54,7 +55,7 @@ def main():
 
 
     # logic to dx dy ... predictions
-    # tcp_server.signals.message_camera.connect(logic.get_dposorient_to_follow_target)
+    tcp_server.signals.message_camera.connect(logic.get_dposorient_to_follow_target)
     logic.signals.setFollowedUserSliders.connect(window.update_target_follow_derivatives)
 
     # timers interruptions, send task to TSE when enable
@@ -70,6 +71,9 @@ def main():
     window.ui.btn_loop.clicked.connect(window.loop_button_callback)
     # log to file button callback
     window.ui.btn_log_to_file.clicked.connect(window.log_to_file_callback)
+
+    # stabilize button enabled
+    # window.ui.btn_stabilize.clicked.connect(window.stabilize_callback)
 
     #threading Serial and TCP
     thread = threading.Thread(target=serial_reader.loop, daemon=True)

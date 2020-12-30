@@ -1,6 +1,7 @@
 import serial
 from datetime import datetime
 from PySide2.QtCore import *
+from PySide2.QtWidgets import QFileDialog
 
 
 def parse(message):
@@ -58,7 +59,7 @@ class SerialReader:
             if self.ser.in_waiting:
                 message = self.read()
                 # print(message)
-                if b'ac' not in message and b'TASK' not in message:
+                if b'ac' not in message and b'TASK' not in message and b'PAST' not in message:
                     print(message)
 
                 self.signals.message.emit(message)
@@ -73,7 +74,8 @@ class MeasurementLogger:
         self.file_handler = 0
 
     def create_file(self):
-        self.file_handler = open("logs/without_PID.txt", "w+")
+        name = QFileDialog.getSaveFileName()
+        self.file_handler = open(name[0], "w+")
         self.time = datetime.timestamp(datetime.now())
 
     def write_to_file(self, content: str):

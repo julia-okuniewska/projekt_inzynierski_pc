@@ -58,7 +58,7 @@ class TCP_Server:
                         end = message.find('end')
                         message = message[start + 3:end].split(";")
                         if len(message) > 2:
-                            print(message)
+                            # print(message)
                             self.signals.message_imu.emit(message)
                     else:
                         self.signals.message_camera.emit(str(data))
