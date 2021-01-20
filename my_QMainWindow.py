@@ -209,6 +209,32 @@ class TseMainWindow(QMainWindow):
             if self.ui.radio_log_imu.isChecked():
                 self.logger.write_to_file(text)
 
+        values = [0, 0, 0, 0, 0, 0]
+
+        def override_sliders():
+            print(values)
+            for i in self.d_sliders:
+                self.d_sliders[i].setValue(values[i])
+
+        if self.ui.btn_stabilize.isChecked():
+            pitch_measure = float(self.latest_IMU_measure[1])
+            d_pitch = 0
+            if abs(pitch_measure) > 0.1:
+                d_pitch = - pitch_measure * 10
+            # else:
+            #     d_pitch = 0
+            # print(d_pitch)
+            values[4] = d_pitch
+
+            # roll_measure = float(self.latest_IMU_measure[0])
+            # d_roll = 0
+            # if abs(roll_measure) > 0.1:
+            #     d_roll = - roll_measure * 10
+            #
+            # # print(d_roll)
+            # values[3] = d_roll
+            override_sliders()
+
         # that was from Arduino in quaternions
         # e = to_euler(float(vals[0]), float(vals[1]), float(vals[2]), float(vals[3]))
         # text = f"{vals[0]} {vals[1]} {vals[2]} {vals[3]} \r\n {e[0]} {e[1]} {e[2]}"
@@ -223,22 +249,22 @@ class TseMainWindow(QMainWindow):
             for i in self.d_sliders:
                 self.d_sliders[i].setValue(values[i])
 
-        if self.ui.btn_stabilize.isChecked():
-            pitch_measure = float(self.latest_IMU_measure[1])
-            # if pitch_measure > 0:
-            #     d_pitch = pitch_measure
-            # elif pitch_measure < 0:
-            #     d_pitch = -pitch_measure
-            # else:
-            #     d_pitch = 0
-
-            if abs(pitch_measure) > 2:
-                d_pitch = - pitch_measure * 10
-            # else:
-            #     d_pitch = 0
-            print(d_pitch)
-            values[4] = d_pitch
-            override_sliders()
+        # if self.ui.btn_stabilize.isChecked():
+        #     pitch_measure = float(self.latest_IMU_measure[1])
+        #     if abs(pitch_measure) > 2:
+        #         d_pitch = - pitch_measure * 10
+        #     # else:
+        #     #     d_pitch = 0
+        #     print(d_pitch)
+        #     values[4] = d_pitch
+        #
+        #     roll_measure = float(self.latest_IMU_measure[0])
+        #     if abs(roll_measure) > 2:
+        #         d_roll = - roll_measure * 10
+        #
+        #     print(d_roll)
+        #     values[3] = d_roll
+        #     override_sliders()
 
         if self.ui.btn_enable_yaw.isChecked() or self.ui.btn_enable_z.isChecked():
             d_z, d_yaw = dd

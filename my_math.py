@@ -6,7 +6,6 @@ import numpy as np
 from math import atan2, asin
 
 
-
 def rotx(angle):
     angle = np.radians(angle)
     sin_a, cos_a = np.sin(angle), np.cos(angle)
@@ -206,6 +205,9 @@ class Logic:
             dir_width, dir_height, val_width, val_height = target_data
             val_width = int(float(val_width))
             val_height = int(float(val_height))
+
+            d_yaw = 0
+            d_z = 0
 
             if dir_width == 'left':
                 d_yaw = - 0.5 * val_width
